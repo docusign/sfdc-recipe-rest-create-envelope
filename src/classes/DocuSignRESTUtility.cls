@@ -24,9 +24,48 @@ public class DocuSignRESTUtility {
         }
     }
 
+    private static Docusign_Access_Token__c processNewAccessToken() {
+        Map<String, Object> tokInfo     = createNewAccessToken();
+        Docusign_Access_Token__c accTok = new Docusign_Access_Token__c(
+            Expire_Time__c = String.ValueOf((Datetime.now().getTime()/1000) + (Integer)tokInfo.get('expires_in')),
+            Token_Value__c = (String)tokInfo.get('access_token')
+        );
+        return accTok;
+    }
+
+    public static Docusign_Access_Token__c getAccessToken() {
+        
+        Docusign_Access_Token__c token = null;
+        // authData = getAuthData();
+        
+        List<Docusign_Access_Token__c> dats = [
+            SELECT Id, Expire_Time__c, Token_Value__c
+            FROM Docusign_Access_Token__c
+            ORDER BY Expire_Time__c DESC, CreatedDate DESC
+        ];
+        if (dats != null && dats.size() > 0) {
+            Docusign_Access_Token__c existing = dats[0];
+            Long expTime = long.valueOf(existing.Expire_Time__c);
+            if ( expTime != null && expTime > ( Datetime.now().getTime() / 1000 ) ) {
+                token = existing;
+                System.Debug('Retrieve existing access token from object and it is : ' + token);
+            }
+            else {
+                token = processNewAccessToken();
+                System.Debug('New access token created and it is : ' + token);
+            }
+        }
+        else 
+        {
+            token = processNewAccessToken();
+            System.Debug('New access token created and it is : ' + token);
+        }
+        return token;
+    }
+
     //This method will call the DocuSignJWT class to obtain an access token from DocuSign
-    public static String getAccessToken() {
-        String access_token = null;
+    public static Map<String, Object> createNewAccessToken() {
+         Map<String, Object> access_token = null;
         
         //Instantiate a request object
         HttpRequest req = new HttpRequest();
@@ -67,32 +106,33 @@ public class DocuSignRESTUtility {
 
         System.Debug(LoggingLevel.INFO, '**ResponseAuthBody' + res.getbody());
         System.Debug(LoggingLevel.INFO, '**ResponseAuth' + res);
+
+        Map<String, Object> token = (Map<String, Object>)JSON.deserializeUntyped(res.getBody());
 		
 	//Obtain the access token from the Response
         if (res.getStatusCode() == 200) {
-            System.JSONParser parser = System.JSON.createParser(res.getBody());
-            while (parser.nextToken() != null) {
-                if ((parser.getCurrentToken() == JSONToken.FIELD_NAME) && (parser.getText() == 'access_token')) {
-                    parser.nextToken();
-                    access_token = parser.getText();
-                    break;
-                }
-            }
+            access_token = token; 
         }
 
         return access_token;
 
     }
     
+    private static void insertAccessTokenIfNew(Docusign_Access_Token__c accTok) {
+        if (String.isBlank(accTok.Id)) {
+            insert accTok;
+        }
+    }
+    
     //This method will invoke the outbound REST call to the Docusign API for creating the envelope
     @future(callout=true)
     public static void createEnvelope() {
         //Get the access token
-        String accessToken = getAccessToken();
+        Docusign_Access_Token__c accessToken = getAccessToken();   
         System.Debug(LoggingLevel.INFO, '***accessToken ' + accessToken);
 
         //Call envelope Creation service if a non-empty access token is returned
-        if (!String.isEmpty(accessToken)) {
+        if (!String.isEmpty(accessToken.Token_Value__c)) {
             //instantiate an Http instance  
             Http httpProtocol = new Http();
 
@@ -110,7 +150,7 @@ public class DocuSignRESTUtility {
 
             //set Authentication Header
             request.setHeader('grant_type', 'Bearer');
-            request.setHeader('Authorization', 'Bearer ' + accessToken);
+            request.setHeader('Authorization', 'Bearer ' + accessToken.Token_Value__c);
 
             //set Accept Header
             request.setHeader('Accept', 'application/json');
@@ -125,6 +165,7 @@ public class DocuSignRESTUtility {
             requestObject.status = settingsMap.get('RequestEnvelopeStatus').Value__c;
             requestObject.emailSubject = settingsMap.get('RequestEnvelopeSubject').Value__c;
             requestObject.templateId = settingsMap.get('RequestEnvelopeTemplateID').Value__c;
+                        
 
             System.Debug(LoggingLevel.INFO, '***requestObject() ' + requestObject);
             String jsonBody = json.serialize(requestObject);
@@ -143,6 +184,9 @@ public class DocuSignRESTUtility {
                 responseObject = (DocuSignRESTUtility.EnvelopeCreationResponse)System.JSON.deserialize(response.getBody(), DocuSignRESTUtility.EnvelopeCreationResponse.class);
                 System.Debug(LoggingLevel.INFO, '***responseObject ' + responseObject);
             }
+            
+            insertAccessTokenIfNew(accessToken);
+            
         }
     }
 
