@@ -108,7 +108,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
    
 ### 7. Salesforce Remote Site Settings: 
 - Add '	https://account-d.docusign.com' as a Remote Site URL in your Salesforce instance. 
-- DocuSign or Salesforce managed package already adds 'https://demo.docusign.net' as a Remote Site URL.
+- DocuSign eSignature for Salesforce managed package already adds 'https://demo.docusign.net' as a Remote Site URL.
 - Both thes URL's should be present under Remote Site settings for the integration to work as expected
 
 ### 8. Access Token Demo: 
