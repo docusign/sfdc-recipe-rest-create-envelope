@@ -23,7 +23,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
 
 ##  Building Blocks:
 - Install DocuSign eSignature for Salesforce
-- DocuSign Integrator Key setup.
+- DocuSign Integration Key setup.
 - DocuSign Template Setup.
 - Installing Github source.
 - Salesforce Remote Sites and Custom Metadata types setup.
@@ -34,12 +34,12 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
   ### 1. Install DocuSign eSignature for Salesforce
   After setting up a Salesforce Developer account as well as a DocuSign Developer account, [Install DocuSign eSignature for Salesforce from AppExchange](https://appexchange.salesforce.com/listingDetail?listingId=a0N30000001taX4EAI) in your Salesforce org.
   
-  ### 2. DocuSign Integrator key setup 
+  ### 2. DocuSign Integration key setup 
   - Login to your DocuSign Developer account and click on **Settings** . 
-  - Select **API and Keys** link which should be found under **'Integrations'**. 
-  - Click on **Add Integrator Key**
+  - Select **Apss and Keys** link which should be found under **'Integrations'**. 
+  - Click on **Add App & Integration Key**
   - Provide an App Description and click **Save**
-  - Click on the newly created Integrator Key and from the resulting pop-up note down the **Integrator Key** . This will be a unique GUID which will be associated with your Integrator key.This needs to be updated in Salesforce.
+  - Click on the newly created Integration Key and from the resulting pop-up note down the **Integrator Key** . This will be a unique GUID which will be associated with your Integrator key.This needs to be updated in Salesforce.
   - Click on **Add URI** and add 'https://localhost.com'.
   - Click on **Add RSA Key Pair** and note down the Private Key. 
   The Private key will be updated in Salesforce. **Do not copy the ----BEGIN RSA PRIVATE KEY---- and ----END RSA PRIVATE KEY---- lines**. 
@@ -50,14 +50,14 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
  ![Integrator Key Screenshot](/images/IntegratorKey.JPG) 
  
  #### Impersonating user for API calls.
- Since our recipe will be using the Integrator key to send Envelopes we must ensure that a DocuSign user provides consent to the Integrator key. In this case the DocuSign user will be our Sandbox user. In case of service integrations we can setup a service user and grant consent on this user's behalf.
+ Since our recipe will be using the Integration key to send Envelopes we must ensure that a DocuSign user provides consent to the Integrator key. In this case the DocuSign user will be our Sandbox user. In case of service integrations we can setup a service user and grant consent on this user's behalf.
  
  To complete this step open the following URI in a browser:
  
  `https://account-d.docusign.com/oauth/auth?
   response_type=code&scope=signature%20impersonation&client_id=YOUR_KEY&redirect_uri=https://localhost.com`
  
- Make sure we add the correct Integrator key for the client_id URL parameter and also make sure the redirect_uri parameter matches with the redirect uri you have setup under the integrator key.
+ Make sure we add the correct Integration key for the client_id URL parameter and also make sure the redirect_uri parameter matches with the redirect uri you have setup under the integration key.
  
  This will open up a consent screen. Click Accept
  
@@ -66,8 +66,8 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
  After clicking Accept you will be redirected to the redirect URI specified in the URI as well as the Integrator key. For the purpose of this recipe I am using 'https://localhost.com' so, if you are redirected to this URI it means that the consent has been granted successfully.
  
   ### 3. Note down DocuSign API UserName and API AccountID.
-  - Login to your DocuSign Developer Sandbox and click on **Go to Admin** . 
-  - Select **API and Keys** link which should be found under **'Integrations'**. 
+  - Login to your DocuSign Developer account and click on **Settings** . 
+  - Select **Apss and Keys** link which should be found under **'Integrations'**. 
   - Note down the **API Username** and **API AccountID**. This will be stored in Salesforce Custom Metadata.
   
   ### 4. DocuSign Template Setup.
@@ -101,7 +101,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
    - DSAccount  -> Your DocuSign API AccountID noted in step 3.
    - DSUserName -> Your DocuSign API Username noted in step 3.
    - DSUserName -> Your DocuSign API Username noted in step 3.
-   - RequestIntegratorKey -> Your Integrator Key Id created in step 2.
+   - RequestIntegratorKey -> Your Integratn Key Id created in step 2.
    - RequestPrivateKey -> Your Private Key created in step 2.
    - RequestEnvelopeTemplateID -> Your DocuSign template Id created in Step 4.
    - RequestEnvelopeSubject -> Subject for the DocuSign Envelope (Edit this value if you want your own subject)
