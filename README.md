@@ -35,7 +35,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
   After setting up a Salesforce Developer account as well as a DocuSign Developer account, [Install DocuSign eSignature for Salesforce from AppExchange](https://appexchange.salesforce.com/listingDetail?listingId=a0N30000001taX4EAI) in your Salesforce org.
   
   ### 2. DocuSign Integrator key setup 
-  - Login to your DocuSign Developer Sandbox and click on **Go to Admin** . 
+  - Login to your DocuSign Developer account and click on **Settings** . 
   - Select **API and Keys** link which should be found under **'Integrations'**. 
   - Click on **Add Integrator Key**
   - Provide an App Description and click **Save**
