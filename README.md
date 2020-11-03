@@ -120,8 +120,6 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
 - Navigate to the generated log file and choose *Debug Only* level to monitor the logs generated.
 - If the Integration and setup is successfull you will notice a Status Code of 200 and the **ResponseAuthBody** parameter will also contain the `access_token`
 
-![DeveloperConsole.JPG](/images/DeveloperConsole.JPG) 
-
 ### 9. Send Envelope using Apex:
 - Open Developer Console
 - Press CTRL + E (open execute Anonymous code window)
