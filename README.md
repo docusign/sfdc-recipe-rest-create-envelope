@@ -81,7 +81,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
   
   - Note down the Template ID. This will be stored in Salesforce Custom metadata.
   
-  ![Template Id](/images/TemplateId.JPG) 
+  ![Template Id](/images/TemplateId.png) 
   
 
 ### 5. Install Source:
