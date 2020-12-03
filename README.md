@@ -47,7 +47,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
   We have chosen to generate the RSA Key Pair since we will generating the JWT token to pass to the authentication key using the Private Key that we have noted down. This Private Key will be signed with Header and Body of the Request to complete the JWT token. Please refer the [JSON Web Token Bearer Grant](https://developers.docusign.com/esign-rest-api/guides/authentication/oauth2-jsonwebtoken) link for additional information on JWT and token construction.
   
   
- ![Integrator Key Screenshot](/images/IntegratorKey.JPG) 
+ ![Integrator Key Screenshot](/images/IntegratorKey.png) 
  
  #### Impersonating user for API calls.
  Since our recipe will be using the Integration key to send Envelopes we must ensure that a DocuSign user provides consent to the Integrator key. In this case the DocuSign user will be our Sandbox user. In case of service integrations we can setup a service user and grant consent on this user's behalf.
