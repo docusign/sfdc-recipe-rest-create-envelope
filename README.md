@@ -54,8 +54,7 @@ Configure Envelope sending via Apex. This Apex Utility class can then be used in
  
  To complete this step open the following URI in a browser:
  
- `https://account-d.docusign.com/oauth/auth?
-  response_type=code&scope=signature%20impersonation&client_id=YOUR_KEY&redirect_uri=https://localhost.com`
+ `https://account-d.docusign.com/oauth/auth?response_type=code&scope=signature%20impersonation&client_id=YOUR_KEY&redirect_uri=https://localhost.com`
  
  Make sure we add the correct Integration key for the client_id URL parameter and also make sure the redirect_uri parameter matches with the redirect uri you have setup under the integration key.
  
