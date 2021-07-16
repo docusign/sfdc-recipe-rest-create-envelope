@@ -146,6 +146,75 @@ public class DocuSignRESTUtility {
         }
     }
 
+    public static HttpResponse updateEnvelope(String envelopeId, String body){
+        //Get the access token
+        String accessToken = getAccessToken();
+        System.Debug(LoggingLevel.INFO, '***accessToken ' + accessToken);
+        
+        HttpResponse response = new HttpResponse();
+
+        if (!String.isEmpty(accessToken)) {
+            Http httpProtocol = new Http();
+
+            //instantiate an HttpRequest instance  
+            HttpRequest request = new HttpRequest();
+
+            //Set the request parameters 
+            // Request endpoint for createEnvelope call
+            String endpoint = settingsMap.get('RequestEnvelopeEndpoint').Value__c + settingsMap.get('DSAccountID').Value__c + '/envelopes/' + envelopeId;
+            System.Debug(LoggingLevel.INFO, '***endpoint ' + endpoint);
+            request.setEndPoint(endpoint);
+
+            //set the POST method
+            request.setMethod('PUT');
+
+            //set Authentication Header
+            request.setHeader('grant_type', 'Bearer');
+            request.setHeader('Authorization', 'Bearer ' + accessToken);
+
+            //set Accept Header
+            request.setHeader('Accept', 'application/json');
+
+            //set Content Type Header
+            request.setHeader('Content-type', 'application/json');
+
+            //set String Body
+            request.setBody(body);
+
+            response = httpProtocol.send(request);
+            System.Debug(LoggingLevel.INFO, '***response.getBody() ' + response.getBody());
+            System.debug(LoggingLevel.INFO, '***response.getStatus() ' + response.getStatus());
+        }
+        return response;
+    }
+
+    @future(callout=true)
+    public static void voidEnvelope(String envelopeId, String reason) {
+        // Create Body
+        VoidBodyRequest body = new VoidBodyRequest();
+        body.status = 'voided';
+        body.voidedReason = reason;
+        String jsonBody = JSON.serialize(body);
+
+        // Send the Body to Update 
+        HttpResponse response = updateEnvelope(envelopeId, jsonBody);
+
+        // Checking the Status Code
+        if(response.getStatusCode() != 200){
+            // Parse and Check for Errors
+            DocuSignRESTUtility.errorDetails errorObject = new DocuSignRESTUtility.errorDetails();
+            errorObject = (DocuSignRESTUtility.errorDetails)System.JSON.deserialize(response.getBody(), DocuSignRESTUtility.errorDetails.class);
+            System.Debug(LoggingLevel.INFO, '***Error Code ' + errorObject.errorCode);
+            System.Debug(LoggingLevel.INFO, '***Error Message ' + errorObject.message);
+        }else{
+            // Parse the Response
+            DocuSignRESTUtility.VoidResponse responseObject = new DocuSignRESTUtility.VoidResponse();
+            responseObject = (DocuSignRESTUtility.VoidResponse)System.JSON.deserialize(response.getBody(), DocuSignRESTUtility.VoidResponse.class);
+            System.Debug(LoggingLevel.INFO, '***Envelope Id ' + responseObject.envelopeId);
+        }
+    }
+
+
     //wrapper class for Envelope Creation Request
     //This class can be further re-vamped to create complex Envelopes to be passed to the createEnvelope Service
     //For more information refer https://developers.docusign.com/esign-rest-api/reference/Envelopes/Envelopes/create
@@ -161,6 +230,21 @@ public class DocuSignRESTUtility {
         public String uri { get; set; }
         public String status { get; set; }
         public String statusDateTime { get; set; }
+    }
+    
+    public class VoidBodyRequest {
+        public String status {get; set;}
+        public String voidedReason {get; set;}
+    }
+
+    public class errorDetails {
+        public String errorCode {get; set;}
+        public String message {get; set;}
+    }
+
+    public class VoidResponse {
+        String envelopeId {get; set;}
+        public errorDetails errorDetails {get; set;}
     }
 
 }
